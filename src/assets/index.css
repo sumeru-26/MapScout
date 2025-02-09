@@ -90,6 +90,14 @@
   color: hsl(var(--muted-foreground));
 }
 
+@utility img-left-half {
+  clip-path: inset(0 50% 0 0);
+}
+@utility img-right-half {
+  clip-path: inset(0 0 0 50%);
+}
+
+
 
 @layer base {
   * {

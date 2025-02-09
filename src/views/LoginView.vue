@@ -10,15 +10,20 @@
 
     import { ScanQrCode } from 'lucide-vue-next'
 
-    const code = ref('')
-
     function submit() {
+        console.log(code.value)
+        const decoded = atob(code.value)
+        console.log(decoded)
         const [key, event, type] = decoded.split(' ')
         const test = fetch("https://api.scoutalliance.live/", {
             headers: {
-                "X-SA-Auth-Key": key
+                "Access-Control-Allow-Origin": "*",
+                "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
+                "Access-Control-Allow-Headers": "Content-Type, Authorization, X-Requested-With",
+                "X-SA-Auth-Key": key,
             }
         })
+        console.log(test)
     }
 
 </script>
@@ -37,17 +42,18 @@
             <CardContent class="grid gap-4">
                 <div class="grid gap-2">
                     <Label for="email">Code</Label>
-                    <Input id="code" type="text" />
+                    <Input id="code" type="text" placeholder="Enter the code given by your head scout" />
                 </div>
+                <Button class="w-full" @click.stop.prevent="submit()" v-model="code">
+                    Sign in
+                </Button>
                 <Separator label="or" />
                 <Button disabled>
                     Scan QR code <ScanQrCode class="w-4 h-4 mr-2" />
                 </Button>
             </CardContent>
             <CardFooter>
-                <Button class="w-full" @click.stop.prevent="submit()">
-                    Sign in
-                </Button>
+                
             </CardFooter>
         </Card>
     </div>
