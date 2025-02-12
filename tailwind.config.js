@@ -3,7 +3,15 @@ const animate = require("tailwindcss-animate")
 /** @type {import('tailwindcss').Config} */
 module.exports = {
   darkMode: ["class"],
-  safelist: ["dark"],
+  safelist: [
+    'dark',
+    // 'img-left-half',
+    // 'img-right-half',
+    // 'left-57/200',
+    // { pattern: '/(left|right)-(57\/200|99\/400|105\/400|69\/160|68\/160|67\/160|25\/200)/' },
+    // { pattern: '/top-(22\/50|47\/100|29\/100|65\/100)/' },
+    // { pattern: '/(-)rotate-(35|90)/' },
+  ],
   prefix: "",
   
   content: [
