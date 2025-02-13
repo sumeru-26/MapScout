@@ -13,6 +13,8 @@
 
   const brickedInput = ref(false)
 
+  const matchStarted = ref(false)
+
   const reefButtonState = ref('reef')
   const processorButtonState = ref('processor')
   const climbButtonState = ref('climb')
@@ -87,7 +89,7 @@
     return `absolute ${(fieldSide.value == 'left') ? 'left-333/800' : 'right-333/800'} top-29/100 w-1/7 h-1/17 ${fieldSide.value == 'left' ? 'rotate-90' : '-rotate-90'}`
   })
   const climbStateDivClass = computed(() => {
-    return `absolute ${(fieldSide.value == 'left') ? 'left-184/400' : 'right-184/400'} top-39/200 w-1/16 grid grid-rows-3 gap-y-4`
+    return `absolute ${(fieldSide.value == 'left') ? 'left-175/400' : 'right-175/400'} top-39/200 w-1/16 grid grid-rows-3 gap-y-4`
   })
   const processorButtonClass = computed(() => {
     return `absolute ${(fieldSide.value == 'left') ? 'left-73/200' : 'right-73/200'} top-90/100 w-1/10`
@@ -100,62 +102,71 @@
 
 <template>
   <img src="/src/public/full_field_transparent_bg.png" :class="imgClass">
-  <Button v-if="reefButtonState=='reef'" @click.stop.prevent="reefButtonState='levels'" variant="outline" :class="reefButtonClass">Reef</Button>
-  <div v-if="reefButtonState=='levels'" :class="reefLevelsDivClass">
-    <Button @click.stop.prevent="reefButtonState='scored'" variant="outline" class="h-1/4">L1</Button>
-    <Button @click.stop.prevent="reefButtonState='scored'" variant="outline" class="h-1/4">L2</Button>
-    <Button @click.stop.prevent="reefButtonState='scored'" variant="outline" class="h-1/4">L3</Button>
-    <Button @click.stop.prevent="reefButtonState='scored'" variant="outline" class="h-1/4">L4</Button>
+  
+  <div v-if="!matchStarted">
+    <Button variant="outline" @click.stop.prevent="() => { matchStarted=true }" :class="startFarButtonClass">Far</Button>
+    <Button variant="outline" @click.stop.prevent="() => { matchStarted=true }" :class="startMidButtonClass">Mid</Button>
+    <Button variant="outline" @click.stop.prevent="() => { matchStarted=true }" :class="startCloseButtonClass">Close</Button>
   </div>
-  <div v-if="reefButtonState=='scored'" :class="reefScoredDivClass">
-    <Button @click.stop.prevent="reefButtonState='reef'" variant="outline" class="h-1/4">
-      <Check class="w-4 h-4" />
-    </Button>
-    <Button @click.stop.prevent="reefButtonState='reef'" variant="outline" class="h-1/4">
-      <X class="w-4 h-4" />
-    </Button>
-    <Button @click.stop.prevent="reefButtonState='reef'" variant="outline" class="h-1/4">
-      <Circle class="w-4 h-4" />
-    </Button>
+  <div v-if="matchStarted">
+    <Button v-if="reefButtonState=='reef'" @click.stop.prevent="reefButtonState='levels'" variant="outline" :class="reefButtonClass">Reef</Button>
+    <div v-if="reefButtonState=='levels'" :class="reefLevelsDivClass">
+      <Button @click.stop.prevent="reefButtonState='scored'" variant="outline" class="h-1/4">L1</Button>
+      <Button @click.stop.prevent="reefButtonState='scored'" variant="outline" class="h-1/4">L2</Button>
+      <Button @click.stop.prevent="reefButtonState='scored'" variant="outline" class="h-1/4">L3</Button>
+      <Button @click.stop.prevent="reefButtonState='scored'" variant="outline" class="h-1/4">L4</Button>
+    </div>
+    <div v-if="reefButtonState=='scored'" :class="reefScoredDivClass">
+      <Button @click.stop.prevent="reefButtonState='reef'" variant="outline" class="h-1/4">
+        <Check color="green" class="w-4 h-4" />
+      </Button>
+      <Button @click.stop.prevent="reefButtonState='reef'" variant="outline" class="h-1/4">
+        <X color="red" class="w-4 h-4" />
+      </Button>
+      <Button @click.stop.prevent="reefButtonState='reef'" variant="outline" class="h-1/4">
+        <Circle color="#2bbd98" class="w-4 h-4" />
+      </Button>
+    </div>
+    <Button variant="outline" :class="intakeTopButtonClass">Intake</Button>
+    <Button variant="outline" :class="intakeBottomButtonClass">Intake</Button>
+    <Button variant="outline" class="absolute w-1/11 h-1/8 left-15/100 top-44/100">Ground Intake</Button>
+    <Button v-if="netButtonState=='net'" @click.stop.prevent="netButtonState='player'" variant="outline" :class="netShotButtonClass">Net Shot</Button>
+    <div v-if="netButtonState=='player'" :class="netButtonsDivClass">
+      <Button @click.stop.prevent="netButtonState='scored'" variant="outline" class="">
+        <PersonStanding color="tan" class="w-4 h-4" />
+      </Button>
+      <Button @click.stop.prevent="netButtonState='scored'" variant="outline" class="">
+        <Bot class="w-4 h-4" />
+      </Button>
+    </div>
+    <div v-if="netButtonState=='scored'" :class="netButtonsDivClass">
+      <Button @click.stop.prevent="netButtonState='net'" variant="outline" class="">
+        <Check color="green" class="w-4 h-4" />
+      </Button>
+      <Button @click.stop.prevent="netButtonState='net'" variant="outline" class="">
+        <X color="red" class="w-4 h-4" />
+      </Button>
+    </div>
+    <Button variant="outline" :class="crossedFieldButtonClass">Crossed Field</Button>
+    <Button v-if="climbButtonState=='climb'" @click.stop.prevent="climbButtonState='state'" variant="outline" :class="endgameButtonClass">Endgame</Button>
+    <div v-if="climbButtonState=='state'" :class="climbStateDivClass">
+      <Button @click.stop.prevent="climbButtonState='climb'" variant="outline" class="">Deep</Button>
+      <Button @click.stop.prevent="climbButtonState='climb'" variant="outline" class="">Shallow</Button>
+      <Button @click.stop.prevent="climbButtonState='climb'" variant="outline" class="">Park</Button>
+    </div>
+    <Button v-if="processorButtonState=='processor'" @click.stop.prevent="processorButtonState='scored'" variant="outline" :class="processorButtonClass">Processor</Button>
+    <div v-if="processorButtonState=='scored'" :class="processorScoredDivClass">
+      <Button @click.stop.prevent="processorButtonState='processor'" variant="outline" class="h-1/4">
+        <Check color="green" class="w-4 h-4" />
+      </Button>
+      <Button @click.stop.prevent="processorButtonState='processor'" variant="outline" class="h-1/4">
+        <X color="red" class="w-4 h-4" />
+      </Button>
+    </div>
   </div>
-  <Button variant="outline" :class="intakeTopButtonClass">Intake</Button>
-  <Button variant="outline" :class="intakeBottomButtonClass">Intake</Button>
-  <Button variant="outline" :class="startFarButtonClass">Far</Button>
-  <Button variant="outline" :class="startMidButtonClass">Mid</Button>
-  <Button variant="outline" :class="startCloseButtonClass">Close</Button>
-  <Button v-if="netButtonState=='net'" @click.stop.prevent="netButtonState='player'" variant="outline" :class="netShotButtonClass">Net Shot</Button>
-  <div v-if="netButtonState=='player'" :class="netButtonsDivClass">
-    <Button @click.stop.prevent="netButtonState='scored'" variant="outline" class="">
-      <PersonStanding class="w-4 h-4" />
-    </Button>
-    <Button @click.stop.prevent="netButtonState='scored'" variant="outline" class="">
-      <Bot class="w-4 h-4" />
-    </Button>
-  </div>
-  <div v-if="netButtonState=='scored'" :class="netButtonsDivClass">
-    <Button @click.stop.prevent="netButtonState='net'" variant="outline" class="">
-      <Check class="w-4 h-4" />
-    </Button>
-    <Button @click.stop.prevent="netButtonState='net'" variant="outline" class="">
-      <X class="w-4 h-4" />
-    </Button>
-  </div>
-  <Button variant="outline" :class="crossedFieldButtonClass">Crossed Field</Button>
-  <Button v-if="climbButtonState=='climb'" @click.stop.prevent="climbButtonState='state'" variant="outline" :class="endgameButtonClass">Endgame</Button>
-  <div v-if="climbButtonState=='state'" :class="climbStateDivClass">
-    <Button @click.stop.prevent="climbButtonState='climb'" variant="outline" class="">Deep</Button>
-    <Button @click.stop.prevent="climbButtonState='climb'" variant="outline" class="">Shallow</Button>
-    <Button @click.stop.prevent="climbButtonState='climb'" variant="outline" class="">Park</Button>
-  </div>
-  <Button v-if="processorButtonState=='processor'" @click.stop.prevent="processorButtonState='scored'" variant="outline" :class="processorButtonClass">Processor</Button>
-  <div v-if="processorButtonState=='scored'" :class="processorScoredDivClass">
-    <Button @click.stop.prevent="processorButtonState='processor'" variant="outline" class="h-1/4">
-      <Check class="w-4 h-4" />
-    </Button>
-    <Button @click.stop.prevent="processorButtonState='processor'" variant="outline" class="h-1/4">
-      <X class="w-4 h-4" />
-    </Button>
-  </div>
+  
+  
+  
   <div class="absolute left-1/2 w-1/2 p-5">
     <div class="my-4 flex gap-x-4">
       <div class="grow grid gap-2">
