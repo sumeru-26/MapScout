@@ -10,6 +10,7 @@
   import { Check, X, Circle, PersonStanding, Bot } from 'lucide-vue-next';
 
   const fieldSide = ref('left')
+  const sideSwitch = ref(false) // idfc what this does
 
   const brickedInput = ref(false)
 
@@ -83,7 +84,7 @@
     return `absolute ${(fieldSide.value == 'left') ? 'left-94/200' : 'right-94/200'} top-56/100 grid grid-rows-2 gap-y-16`
   })
   const crossedFieldButtonClass = computed(() => {
-    return `absolute ${(fieldSide.value == 'left') ? 'left-50/100' : 'right-50/100'} top-249/400 w-1/10 h-1/8 ${fieldSide.value == 'left' ? 'rotate-90' : '-rotate-90'}`
+    return `absolute ${(fieldSide.value == 'left') ? 'left-52/100' : 'right-52/100'} top-249/400 w-1/10 h-1/8 ${fieldSide.value == 'left' ? 'rotate-90' : '-rotate-90'}`
   })
   const endgameButtonClass = computed(() => {
     return `absolute ${(fieldSide.value == 'left') ? 'left-333/800' : 'right-333/800'} top-29/100 w-1/7 h-1/17 ${fieldSide.value == 'left' ? 'rotate-90' : '-rotate-90'}`
@@ -97,11 +98,20 @@
   const processorScoredDivClass = computed(() => {
     return `absolute ${(fieldSide.value == 'left') ? 'left-75/200' : 'right-75/200'} top-90/100`
   })
+  const sideMenuDivClass = computed(() => {
+    return `absolute ${(fieldSide.value == 'left') ? 'left-1/2' : 'left-0'} w-1/2 p-5`
+  })
 
 </script>
 
 <template>
+
   <img src="/src/public/full_field_transparent_bg.png" :class="imgClass">
+  <div class="flex items-center space-x-2">
+    <Switch id="side" :default-checked="true" />
+  
+  </div>
+  
   
   <div v-if="!matchStarted">
     <Button variant="outline" @click.stop.prevent="() => { matchStarted=true }" :class="startFarButtonClass">Far</Button>
@@ -164,10 +174,8 @@
       </Button>
     </div>
   </div>
-  
-  
-  
-  <div class="absolute left-1/2 w-1/2 p-5">
+
+  <div :class="sideMenuDivClass">
     <div class="my-4 flex gap-x-4">
       <div class="grow grid gap-2">
         <Label for="team">Team</Label>
