@@ -5,15 +5,47 @@
   import { Switch } from '@/components/ui/switch';
   import { Label } from '@/components/ui/label';
   import { Button } from '@/components/ui/button';
+  import { Input } from '@/components/ui/input';
 
   import { Check, X, Circle, PersonStanding, Bot } from 'lucide-vue-next';
 
   const fieldSide = ref('left')
 
+  const brickedInput = ref(false)
+
   const reefButtonState = ref('reef')
   const processorButtonState = ref('processor')
   const climbButtonState = ref('climb')
   const netButtonState = ref('net')
+  
+  const autoState = ref(false)
+  const autoCountdown = ref(25)
+  const autoStarted = ref(false)
+  const autoEnded = ref(false)
+
+  function tick() {
+    autoCountdown.value -= .01
+    console.log('tick')
+  }
+
+  async function beginAutoCountdown() {
+    if (autoStarted.value && !autoEnded.value) {
+      autoState.value = false
+      autoCountdown.value = 25
+      autoEnded.value = true
+      autoEnded.value = true
+    }
+    autoStarted.value = true
+    autoState.value = true
+    console.log('began')
+    const intervalId = setInterval(tick, 10)
+    setTimeout(() => {
+      clearInterval(intervalId)
+      autoState.value = false
+      autoCountdown.value = 25
+      autoEnded.value = true
+    }, 25000)
+  }
 
   const imgClass = computed(() => {
     return `absolute ${(fieldSide.value == 'left' ? 'img-left-half' : 'img-right-half')} h-screen w-screen`
@@ -123,5 +155,32 @@
     <Button @click.stop.prevent="processorButtonState='processor'" variant="outline" class="h-1/4">
       <X class="w-4 h-4" />
     </Button>
+  </div>
+  <div class="absolute left-1/2 w-1/2 p-5">
+    <div class="my-4 flex gap-x-4">
+      <div class="grow grid gap-2">
+        <Label for="team">Team</Label>
+        <Input id="team" type="number" max="11000" placeholder="Team #" />
+      </div>
+      <div class="grow grid gap-2">
+        <Label for="match">Match</Label>
+        <Input id="match" type="number" max="200" placeholder="Match #" />
+      </div>
+    </div>
+    <div class="my-4 flex items-center gap-x-4">
+      <div class="grow grid gap-2">
+        <Label for="hpTeam">Processor Human Player</Label>
+        <Input id="hpTeam" type="number" max="11000" placeholder="Human Player Team #" />
+      </div>
+      <Button :disabled="autoEnded" @click.stop.prevent="beginAutoCountdown()" :variant="(!autoEnded && autoState) ? '' : 'outline'" class="grow">Auto {{ (!autoEnded && autoState) ? `- ${autoCountdown.toFixed(2)}` : '' }}</Button>
+    </div>
+    <div class="my-4 flex items-center space-x-2">
+      <Switch id="bricked" v-model:checked="brickedInput" :default-checked="true" />
+      <Label for="bricked">Bricked</Label>
+      <div class="ml-5 grow grid gap-1.5">
+        <Label for="brickedReason">Reason</Label>
+        <Input id="brickedReason" :disabled="!brickedInput" placeholder="Why are they bricked? (keep it brief)" />
+      </div>
+    </div>
   </div>
 </template>

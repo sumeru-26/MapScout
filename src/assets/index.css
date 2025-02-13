@@ -77,6 +77,9 @@
 @utility bg-primary {
   background-color: hsl(var(--primary));
 }
+@utility bg-input {
+  background-color: hsl(var(--input));
+} 
 @utility bg-border {
   background-color: hsl(var(--border));
 }
