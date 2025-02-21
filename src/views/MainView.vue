@@ -9,10 +9,23 @@
 
   import { Check, X, Circle, PersonStanding, Bot } from 'lucide-vue-next';
 
-  const fieldSide = ref('left')
-  const sideSwitch = ref(false) // idfc what this does
+  // const fieldSide = ref('left')
+  const fieldBool = ref(false)
+  const fieldSide = computed(() => {
+    if (fieldBool.value) {
+      return 'right'
+    } else {
+      return 'left'
+    }
+  })
 
   const brickedInput = ref(false)
+  const brickedReason = ref('')
+  watch(brickedInput, (_, newState) => {
+      if (newState) {
+        brickedReason.value = ''
+      }
+  })
 
   const matchStarted = ref(false)
 
@@ -51,7 +64,7 @@
   }
 
   const imgClass = computed(() => {
-    return `absolute ${(fieldSide.value == 'left' ? 'img-left-half' : 'img-right-half')} h-screen w-screen`
+    return `absolute ${((fieldSide.value == 'left') ? 'img-left-half' : 'img-right-half')} h-screen w-screen`
   })
   const reefButtonClass = computed(() => {
     return `absolute ${(fieldSide.value == 'left' ? 'left-57/200' : 'right-57/200')} top-22/50 w-1/14 h-1/8`
@@ -76,6 +89,9 @@
   })
   const intakeBottomButtonClass = computed(() => {
     return `absolute ${(fieldSide.value == 'left' ? 'left-25/200' : 'right-25/200')} top-39/50 w-1/13 h-1/16 ${fieldSide.value == 'left' ? 'rotate-35' : '-rotate-35'}`
+  })
+  const intakeGroundButtonClass = computed(() => {
+    return `absolute w-1/11 h-1/8 ${(fieldSide.value == 'left' ? 'left-15/100' : 'right-15/100')} top-44/100`
   })
   const netShotButtonClass = computed(() => {
     return `absolute ${(fieldSide.value == 'left') ? 'left-333/800' : 'right-333/800'} top-65/100 w-1/7 h-1/17 ${fieldSide.value == 'left' ? 'rotate-90' : '-rotate-90'}`
@@ -107,13 +123,15 @@
 <template>
 
   <img src="/src/public/full_field_transparent_bg.png" :class="imgClass">
-  <div class="flex items-center space-x-2">
-    <Switch id="side" :default-checked="true" />
-  
-  </div>
   
   
   <div v-if="!matchStarted">
+    <div class="absolute left-1/2 top-1/2 flex items-center space-x-2">
+      <!-- <Button variant="outline" @click.stop.prevent="console.log('asdfasdf')" >Left</Button>
+      <Button variant="outline" @click.stop.prevent="fieldSide = 'right'" >Right</Button> -->
+      <!-- <Switch v-model:checked="fieldBool" /> -->
+       <Button variant="outline" @click.stop.prevent="fieldBool = !fieldBool">Swap</Button>
+    </div>
     <Button variant="outline" @click.stop.prevent="() => { matchStarted=true }" :class="startFarButtonClass">Far</Button>
     <Button variant="outline" @click.stop.prevent="() => { matchStarted=true }" :class="startMidButtonClass">Mid</Button>
     <Button variant="outline" @click.stop.prevent="() => { matchStarted=true }" :class="startCloseButtonClass">Close</Button>
@@ -134,12 +152,12 @@
         <X color="red" class="w-4 h-4" />
       </Button>
       <Button @click.stop.prevent="reefButtonState='reef'" variant="outline" class="h-1/4">
-        <Circle color="#2bbd98" class="w-4 h-4" />
+        <Circle color="#2bbd98" fill="#2bbd98" class="w-4 h-4" />
       </Button>
     </div>
     <Button variant="outline" :class="intakeTopButtonClass">Intake</Button>
     <Button variant="outline" :class="intakeBottomButtonClass">Intake</Button>
-    <Button variant="outline" class="absolute w-1/11 h-1/8 left-15/100 top-44/100">Ground Intake</Button>
+    <Button variant="outline" class="">Ground Intake</Button>
     <Button v-if="netButtonState=='net'" @click.stop.prevent="netButtonState='player'" variant="outline" :class="netShotButtonClass">Net Shot</Button>
     <div v-if="netButtonState=='player'" :class="netButtonsDivClass">
       <Button @click.stop.prevent="netButtonState='scored'" variant="outline" class="">
@@ -198,7 +216,7 @@
       <Label for="bricked">Bricked</Label>
       <div class="ml-5 grow grid gap-1.5">
         <Label for="brickedReason">Reason</Label>
-        <Input id="brickedReason" :disabled="!brickedInput" placeholder="Why are they bricked? (keep it brief)" />
+        <Input id="brickedReason" :disabled="!brickedInput" v-model="brickedReason" placeholder="Why are they bricked? (keep it brief)" />
       </div>
     </div>
   </div>
