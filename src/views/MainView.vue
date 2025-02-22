@@ -16,6 +16,10 @@ import DebugWindow from '@/components/debug-window.vue';
   function update(input) {
     var x = ''
     const inputType = input.split(':')[0]
+    if (inputType == 'start') {
+      inputList.value.push(input)
+      return
+    }
     if (inputType == 'reef') {
       if (reefActionInput.value == 'algae') x = 'reef:algae'
       else x = `reef:${reefLevelInput.value}:${reefActionInput.value}`
