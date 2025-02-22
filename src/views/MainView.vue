@@ -38,9 +38,11 @@ import DebugWindow from '@/components/debug-window.vue';
   }
 
   function undo() {
-    if (inputList.value.length > 0) {
+    if (inputList.value.length > 1) {
     const deletedInput = inputList.value.pop()
     redoCache.push(deletedInput)
+    } else if (inputList.value.length == 1) {
+      reset()
     }
   }
 
@@ -255,7 +257,7 @@ import DebugWindow from '@/components/debug-window.vue';
         <X color="red" class="w-4 h-4" />
       </Button>
     </div>
-    <Button @click.stop.prevent="update('crossed')" variant="outline" :class="crossedFieldButtonClass">Crossed Field</Button>
+    <Button v-if="reefButtonState == 'reef'" @click.stop.prevent="update('crossed')" variant="outline" :class="crossedFieldButtonClass">Crossed Field</Button>
     <Button v-if="climbButtonState=='climb'" @click.stop.prevent="climbButtonState='state'" variant="outline" :class="endgameButtonClass">Endgame</Button>
     <div v-if="climbButtonState=='state'" :class="climbStateDivClass">
       <Button @click.stop.prevent="() => { climbButtonState='climb'; update('climb:deep') }" variant="outline" class="">Deep</Button>
