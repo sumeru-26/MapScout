@@ -7,29 +7,45 @@
   import { Button } from '@/components/ui/button';
   import { Input } from '@/components/ui/input';
 
-  import { Check, X, Circle, PersonStanding, Bot } from 'lucide-vue-next';
+  import { Check, X, Circle, PersonStanding, Bot, Undo2, Redo2 } from 'lucide-vue-next';
 import DebugWindow from '@/components/debug-window.vue';
 
   const inputList = ref([])
+  var redoCache = []
 
   function update(input) {
+    var x = ''
     const inputType = input.split(':')[0]
     if (inputType == 'reef') {
-      if (reefActionInput.value == 'algae') inputList.value.push('reef:algae')
-      else inputList.value.push(`reef:${reefLevelInput.value}:${reefActionInput.value}`)
+      if (reefActionInput.value == 'algae') x = 'reef:algae'
+      else x = `reef:${reefLevelInput.value}:${reefActionInput.value}`
       reefLevelInput.value = ''
       reefActionInput.value = ''
     } else if (inputType == 'net') {
-      inputList.value.push(`net:${netTypeInput.value}:${netScoredInput.value}`)
+      x = `net:${netTypeInput.value}:${netScoredInput.value}`
       netTypeInput.value = ''
       netScoredInput.value = ''
     } else {
-      inputList.value.push(input)
+      x = input
     }
-    console.log(inputList.value)
+    // console.log(inputList.value)
+    if (!autoEnded.value) inputList.value.push(`auto:${x}`)
+    else inputList.value.push(x)
   }
 
-  
+  function undo() {
+    if (inputList.value.length > 0) {
+    const deletedInput = inputList.value.pop()
+    redoCache.push(deletedInput)
+    }
+  }
+
+  function redo() {
+    if (redoCache.length > 0) {
+      const deletedInput = redoCache.pop()
+      inputList.value.push(deletedInput)
+    }
+  }
 
   const fieldBool = ref(false)
   const fieldSide = computed(() => {
@@ -66,11 +82,6 @@ import DebugWindow from '@/components/debug-window.vue';
   const autoStarted = ref(false)
   const autoEnded = ref(false)
 
-  function tick() {
-    autoCountdown.value -= .01
-    console.log('tick')
-  }
-
   async function beginAutoCountdown() {
     if (autoStarted.value && !autoEnded.value) {
       autoState.value = false
@@ -80,7 +91,7 @@ import DebugWindow from '@/components/debug-window.vue';
     }
     autoStarted.value = true
     autoState.value = true
-    console.log('began')
+    // console.log('began')
     const intervalId = setInterval(tick, 10)
     setTimeout(() => {
       clearInterval(intervalId)
@@ -88,6 +99,39 @@ import DebugWindow from '@/components/debug-window.vue';
       autoCountdown.value = 25
       autoEnded.value = true
     }, 25000)
+  }
+
+  function tick() {
+    autoCountdown.value -= .01
+    // console.log('tick')
+  }
+
+  function reset() {
+
+    inputList.value = []
+    redoCache = []
+
+    brickedInput.value = false
+    brickedReason.value = ''
+
+    matchStarted.value = false
+
+    reefButtonState.value = 'reef'
+    groundIntakeButtonState.value = 'ground'
+    processorButtonState.value = 'processor'
+    climbButtonState.value = 'climb'
+    netButtonState.value = 'net'
+
+    reefLevelInput.value = ''
+    reefActionInput.value = ''
+    netTypeInput.value = ''
+    netScoredInput.value = ''
+    
+    autoState.value = false
+    autoCountdown.value = 25
+    autoStarted.value = false
+    autoEnded.value = false
+
   }
 
   const imgClass = computed(() => {
@@ -130,7 +174,7 @@ import DebugWindow from '@/components/debug-window.vue';
     return `absolute ${(fieldSide.value == 'left') ? 'left-94/200' : 'right-94/200'} top-56/100 grid grid-rows-2 gap-y-16`
   })
   const crossedFieldButtonClass = computed(() => {
-    return `absolute ${(fieldSide.value == 'left') ? 'left-52/100' : 'right-52/100'} top-249/400 w-1/10 h-1/8 ${fieldSide.value == 'left' ? 'rotate-90' : '-rotate-90'}`
+    return `absolute z-50 ${(fieldSide.value == 'left') ? 'left-52/100' : 'right-52/100'} top-249/400 w-1/10 h-1/8 ${fieldSide.value == 'left' ? 'rotate-90' : '-rotate-90'}`
   })
   const endgameButtonClass = computed(() => {
     return `absolute ${(fieldSide.value == 'left') ? 'left-333/800' : 'right-333/800'} top-29/100 w-1/7 h-1/17 ${fieldSide.value == 'left' ? 'rotate-90' : '-rotate-90'}`
@@ -229,17 +273,17 @@ import DebugWindow from '@/components/debug-window.vue';
     <div class="my-4 flex gap-x-4">
       <div class="grow grid gap-2">
         <Label for="team">Team</Label>
-        <Input id="team" type="number" max="11000" placeholder="Team #" />
+        <Input id="team" type="number" max="11000" placeholder="Team #" autocomplete="off" />
       </div>
       <div class="grow grid gap-2">
         <Label for="match">Match</Label>
-        <Input id="match" type="number" max="200" placeholder="Match #" />
+        <Input id="match" type="number" min="0" max="200" placeholder="Match #" autocomplete="off" />
       </div>
     </div>
     <div class="my-4 flex items-center gap-x-4">
       <div class="grow grid gap-2">
         <Label for="hpTeam">Processor Human Player</Label>
-        <Input id="hpTeam" type="number" max="11000" placeholder="Human Player Team #" />
+        <Input id="hpTeam" type="number" max="11000" placeholder="Human Player Team #" autocomplete="off" />
       </div>
       <Button :disabled="autoEnded" @click.stop.prevent="beginAutoCountdown()" :variant="(!autoEnded && autoState) ? '' : 'outline'" class="grow">Auto {{ (!autoEnded && autoState) ? `- ${autoCountdown.toFixed(2)}` : '' }}</Button>
     </div>
@@ -248,9 +292,23 @@ import DebugWindow from '@/components/debug-window.vue';
       <Label for="bricked">Bricked</Label>
       <div class="ml-5 grow grid gap-1.5">
         <Label for="brickedReason">Reason</Label>
-        <Input id="brickedReason" :disabled="!brickedInput" v-model="brickedReason" placeholder="Why are they bricked? (keep it brief)" />
+        <Input id="brickedReason" :disabled="!brickedInput" v-model="brickedReason" placeholder="Why are they bricked? (keep it brief)" autocomplete="off" />
       </div>
-    </div class="w-full flex justify-end">
-    <DebugWindow class="" />
+    </div>
+    <div class="ml-32">
+      <DebugWindow :input-list="inputList" class="w-full h-32" />
+      <div class="my-2 flex gap-x-2">
+        <Button @click.stop.prevent="undo()" variant="outline" class="grow">
+          <Undo2 />
+        </Button>
+        <Button @click.stop.prevent="redo()" variant="outline" class="grow">
+          <Redo2 />
+        </Button>
+      </div>
+    </div>
+    <div class="flex gap-x-2">
+      <Button class="grow">Submit</Button>
+      <Button @click.stop.prevent="reset()" variant="outline" class="grow">Reset</Button>
+    </div>
   </div>
 </template>
