@@ -74,6 +74,15 @@
 @utility bg-background {
   background-color: hsl(var(--background));
 }
+@utility bg-foreground {
+  background-color: hsl(var(--foreground));
+}
+@utility bg-muted {
+  background-color: hsl(var(--muted));
+}
+@utility bg-muted-foreground {
+  background-color: hsl(var(--muted-foreground));
+}
 @utility bg-primary {
   background-color: hsl(var(--primary));
 }
