@@ -178,7 +178,7 @@ import DebugWindow from '@/components/debug-window.vue';
     return `absolute ${(fieldSide.value == 'left') ? 'left-94/200' : 'right-94/200'} top-56/100 grid grid-rows-2 gap-y-16`
   })
   const crossedFieldButtonClass = computed(() => {
-    return `absolute z-50 ${(fieldSide.value == 'left') ? 'left-52/100' : 'right-52/100'} top-249/400 w-1/10 h-1/8 ${fieldSide.value == 'left' ? 'rotate-90' : '-rotate-90'}`
+    return `absolute z-50 ${(fieldSide.value == 'left') ? 'left-35/100' : 'right-35/100'} top-44/100 w-1/7 h-1/15 ${fieldSide.value == 'left' ? 'rotate-90' : '-rotate-90'}`
   })
   const endgameButtonClass = computed(() => {
     return `absolute ${(fieldSide.value == 'left') ? 'left-333/800' : 'right-333/800'} top-29/100 w-1/7 h-1/17 ${fieldSide.value == 'left' ? 'rotate-90' : '-rotate-90'}`
@@ -299,7 +299,7 @@ import DebugWindow from '@/components/debug-window.vue';
         <Input id="brickedReason" :disabled="!brickedInput" v-model="brickedReason" placeholder="Why are they bricked? (keep it brief)" autocomplete="off" />
       </div>
     </div>
-    <div class="ml-32">
+    <div class="">
       <DebugWindow :input-list="inputList" class="w-full h-32" />
       <div class="my-2 flex gap-x-2">
         <Button @click.stop.prevent="undo()" variant="outline" class="grow">
