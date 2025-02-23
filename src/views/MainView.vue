@@ -8,7 +8,8 @@
   import { Input } from '@/components/ui/input';
 
   import { Check, X, Circle, PersonStanding, Bot, Undo2, Redo2 } from 'lucide-vue-next';
-import DebugWindow from '@/components/debug-window.vue';
+  import DebugWindow from '@/components/debug-window.vue';
+  import SubmissionWindow from '@/components/submission-window.vue';
 
   const inputList = ref([])
   var redoCache = []
@@ -25,11 +26,11 @@ import DebugWindow from '@/components/debug-window.vue';
       else x = `reef:${reefLevelInput.value}:${reefActionInput.value}`
       reefLevelInput.value = ''
       reefActionInput.value = ''
-    } else if (inputType == 'net') {
+    } /* else if (inputType == 'net') {
       x = `net:${netTypeInput.value}:${netScoredInput.value}`
       netTypeInput.value = ''
       netScoredInput.value = ''
-    } else {
+    } */ else {
       x = input
     }
     // console.log(inputList.value)
@@ -77,11 +78,12 @@ import DebugWindow from '@/components/debug-window.vue';
   const processorButtonState = ref('processor')
   const climbButtonState = ref('climb')
   const netButtonState = ref('net')
+  const submitState = ref(false)
 
   const reefLevelInput = ref('')
   const reefActionInput = ref('')
-  const netTypeInput = ref('')
-  const netScoredInput = ref('')
+  // const netTypeInput = ref('')
+  // const netScoredInput = ref('')
   
   const autoState = ref(false)
   const autoCountdown = ref(25)
@@ -130,8 +132,8 @@ import DebugWindow from '@/components/debug-window.vue';
 
     reefLevelInput.value = ''
     reefActionInput.value = ''
-    netTypeInput.value = ''
-    netScoredInput.value = ''
+    // netTypeInput.value = ''
+    // netScoredInput.value = ''
     
     autoState.value = false
     autoCountdown.value = 25
@@ -180,7 +182,7 @@ import DebugWindow from '@/components/debug-window.vue';
     return `absolute ${(fieldSide.value == 'left') ? 'left-94/200' : 'right-94/200'} top-56/100 grid grid-rows-2 gap-y-16`
   })
   const crossedFieldButtonClass = computed(() => {
-    return `absolute z-50 ${(fieldSide.value == 'left') ? 'left-35/100' : 'right-35/100'} top-44/100 w-1/7 h-1/15 ${fieldSide.value == 'left' ? 'rotate-90' : '-rotate-90'}`
+    return `absolute ${(fieldSide.value == 'left') ? 'left-35/100' : 'right-35/100'} top-44/100 w-1/7 h-1/15 ${fieldSide.value == 'left' ? 'rotate-90' : '-rotate-90'}`
   })
   const endgameButtonClass = computed(() => {
     return `absolute ${(fieldSide.value == 'left') ? 'left-333/800' : 'right-333/800'} top-29/100 w-1/7 h-1/17 ${fieldSide.value == 'left' ? 'rotate-90' : '-rotate-90'}`
@@ -240,20 +242,20 @@ import DebugWindow from '@/components/debug-window.vue';
         <Circle color="#2bbd98" fill="#2bbd98" class="w-4 h-4" />
       </Button>
     </div>
-    <Button v-if="netButtonState=='net'" @click.stop.prevent="netButtonState='player'" variant="outline" :class="netShotButtonClass">Net Shot</Button>
-    <div v-if="netButtonState=='player'" :class="netButtonsDivClass">
+    <Button v-if="netButtonState=='net'" @click.stop.prevent="netButtonState='scored'" variant="outline" :class="netShotButtonClass">Net Shot</Button>
+    <!-- <div v-if="netButtonState=='player'" :class="netButtonsDivClass">
       <Button @click.stop.prevent="() => { netButtonState='scored'; netTypeInput='human' }" variant="outline" class="">
         <PersonStanding color="tan" class="w-4 h-4" />
       </Button>
       <Button @click.stop.prevent="() => { netButtonState='scored'; netTypeInput='bot' }" variant="outline" class="">
         <Bot class="w-4 h-4" />
       </Button>
-    </div>
+    </div> -->
     <div v-if="netButtonState=='scored'" :class="netButtonsDivClass">
-      <Button @click.stop.prevent="() => { netButtonState='net'; netScoredInput='hit'; update('net') }" variant="outline" class="">
+      <Button @click.stop.prevent="() => { netButtonState='net'; update('net:hit') }" variant="outline" class="">
         <Check color="green" class="w-4 h-4" />
       </Button>
-      <Button @click.stop.prevent="() => { netButtonState='net'; netScoredInput='miss'; update('net') }" variant="outline" class="">
+      <Button @click.stop.prevent="() => { netButtonState='net'; update('net:miss') }" variant="outline" class="">
         <X color="red" class="w-4 h-4" />
       </Button>
     </div>
@@ -313,8 +315,14 @@ import DebugWindow from '@/components/debug-window.vue';
       </div>
     </div>
     <div class="flex gap-x-2">
-      <Button class="grow">Submit</Button>
+      <Button class="grow" @click.stop.prevent="submitState=true">Submit</Button>
       <Button @click.stop.prevent="reset()" variant="outline" class="grow">Reset</Button>
     </div>
   </div>
+  <div v-show="submitState" class="absolute h-screen w-screen bg-background opacity-75"></div>
+  <div v-show="submitState" class="absolute h-screen w-screen p-25">
+    <!-- <div class="absolute h-full w-full bg-background opacity-100 z-10"></div> -->
+    <SubmissionWindow :input-list="inputList" :open-state="submitState" class="h-full w-full z-50" />
+  </div>
+  
 </template>
