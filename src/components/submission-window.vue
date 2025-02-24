@@ -43,6 +43,7 @@
             'event': '2025test',
             'type': 'match',
             'match': 0,
+            'team': '2374',
             'bot': 0
         }
         var data = {
@@ -168,7 +169,7 @@
                 } else if (inputType == 'processor') {
                     data[(autoInput) ? 'auto' : 'teleop']['processor'][inputSegs[1]]++
                 } else if (inputType == 'team') {
-                    metadata['team'] = inputSegs[1]
+                    metadata['bot'] = inputSegs[1]
                 } else if (inputType == 'match') {
                     metadata['match'] = inputSegs[1]
                 } else if (inputType == 'bricked') {
