@@ -1,6 +1,8 @@
 <script setup>
 
-    import { ref, watch } from 'vue'
+    import { ref, watch, computed } from 'vue'
+
+    import VueQrcode from '@chenfengyuan/vue-qrcode'
 
     import {
         Card,
@@ -10,12 +12,18 @@
         CardHeader,
         CardTitle,
     } from '@/components/ui/card'
+    import { Button } from '@/components/ui/button';
 
     const { inputList, openState } = defineProps(['inputList', 'openState'])
 
     const state = ref('')
+    const errorMessage = ref('')
+    const debugData = ref({})
 
-    const test = ref('asdf')
+    const entry = ref()
+    const entryEncoded = computed(() => {
+        return btoa(JSON.stringify(entry.value))
+    })
 
     watch(() => openState, (_, newState) => {
         // console.log(newState)
@@ -25,15 +33,26 @@
     })
 
     function compile() {
-        
-        state.value = 'json'
 
+        console.log(inputList)
+        
+        state.value = 'compiling'
+
+
+        var metadata = {
+            'event': '2025test',
+            'type': 'match',
+            'match': 0,
+            'bot': 0
+        }
         var data = {
             'start': '',
             'auto': {
                 'intake': {
-                    'top': 0,
-                    'bottom': 0,
+                    'station': {
+                        'top': 0,
+                        'bottom': 0,
+                    },
                     'ground': {
                         'coral': 0,
                         'algae': 0
@@ -56,7 +75,7 @@
                         'hit': 0,
                         'miss': 0,
                     },
-                    'algae': 0
+                    'algae': 0,
                 },
                 'processor': {
                     'hit': 0,
@@ -70,8 +89,10 @@
             },
             'teleop': {
                 'intake': {
-                    'top': 0,
-                    'bottom': 0,
+                    'station': {
+                        'top': 0,
+                        'bottom': 0,
+                    },
                     'ground': {
                         'coral': 0,
                         'algae': 0
@@ -94,6 +115,7 @@
                         'hit': 0,
                         'miss': 0,
                     },
+                    'algae': 0,
                 },
                 'processor': {
                     'hit': 0,
@@ -111,12 +133,73 @@
                 'reason': ''
             }
         }
+
+        try {
+
+            for (let input of inputList) {
+                const autoInput = input.includes('auto')
+                if (autoInput) {
+                    input = input.split('^')[1]
+                    // console.log(input)
+                }
+                const inputSegs = input.split(':')
+                console.log(inputSegs)
+                const inputType = inputSegs[0]
+                if (inputType == 'start') {
+                    data['start'] = inputSegs[1]
+                } else if (inputType == 'reef') {
+                    if (inputSegs[1] == 'algae') {
+                        data[(autoInput) ? 'auto' : 'teleop']['reef']['algae']++
+                    } else {
+                        data[(autoInput) ? 'auto' : 'teleop']['reef'][`l${inputSegs[1]}`][inputSegs[2]]++
+                    }
+                } else if (inputType == 'intake') {
+                    if (inputSegs[1] == 'station') {
+                        data[(autoInput) ? 'auto' : 'teleop']['intake']['station'][inputSegs[2]]++
+                    } else if (inputSegs[1] == 'ground') {
+                        data[(autoInput) ? 'auto' : 'teleop']['intake']['ground'][inputSegs[2]]++
+                    }
+                } else if (inputType == 'net') {
+                    data[(autoInput) ? 'auto' : 'teleop']['net'][inputSegs[1]]++
+                } else if (inputType == 'crossed') {
+                    data[(autoInput) ? 'auto' : 'teleop']['crossed']++
+                } else if (inputType == 'climb') {
+                    data['endgame'] = inputSegs[1]
+                } else if (inputType == 'processor') {
+                    data[(autoInput) ? 'auto' : 'teleop']['processor'][inputSegs[1]]++
+                } else if (inputType == 'team') {
+                    metadata['team'] = inputSegs[1]
+                } else if (inputType == 'match') {
+                    metadata['match'] = inputSegs[1]
+                } else if (inputType == 'bricked') {
+                    if (inputSegs[1] == 'status') {
+                        data['bricked']['status'] = (inputSegs[2] == 'true')
+                    } else if (inputSegs[1] == 'reason') {
+                        data['bricked']['reason'] = inputSegs[2]
+                    }
+                }
+            }
+
+            entry.value = {
+                'metadata': metadata,
+                'data': data
+            }
+
+        } catch(error) {
+            console.error(error)
+            errorMessage.value = error
+        }
+
+        console.log(entry.value)
+        debugData.value = entry.value
+
+        state.value = 'done'
+
     }
 
-    for (const input of inputList) {
-        const inputType = input.split(':')[0]
-        
-    }
+    
+
+    
 
 </script>
 
@@ -127,10 +210,25 @@
             <CardDescription>Your scouting manager will scan these</CardDescription>
         </CardHeader>
     <CardContent>
-    {{ state }}
+        <p class=" text-red-700 px-[0.3rem] py-[0.2rem] font-mono text-sm font-extralight">
+            {{ errorMessage }}
+        </p>
+        <div v-if="state=='done'" class="w-full h-full flex items-center justify-center">
+            <VueQrcode :value="entryEncoded" :options="{
+                width: 450,
+                color: {
+                    dark: 	'#fafafa',
+                    light: 	'#09090b'
+                }
+            }"></VueQrcode>
+        </div>
+        <!-- <pre class=" text-muted-foreground px-[0.3rem] py-[0.2rem] font-mono text-sm font-extralight">{{ JSON.stringify(inputList, null, '\t') }}</pre> -->
+        <!-- <pre class=" text-muted-foreground px-[0.3rem] py-[0.2rem] font-mono text-sm font-extralight">{{ JSON.stringify(debugData, null, '\t') }}</pre> -->
     </CardContent>
     <CardFooter>
-    Card Footer
+        <div class="w-full flex justify-end">
+            <Button @click.stop.prevent="$emit('resetForm')">Return</Button>
+        </div>
     </CardFooter>
   </Card>
 </template>

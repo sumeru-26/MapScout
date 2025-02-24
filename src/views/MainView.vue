@@ -7,52 +7,12 @@
   import { Button } from '@/components/ui/button';
   import { Input } from '@/components/ui/input';
 
-  import { Check, X, Circle, PersonStanding, Bot, Undo2, Redo2 } from 'lucide-vue-next';
+  import { Check, X, Circle, Undo2, Redo2 } from 'lucide-vue-next';
   import DebugWindow from '@/components/debug-window.vue';
   import SubmissionWindow from '@/components/submission-window.vue';
 
   const inputList = ref([])
   var redoCache = []
-
-  function update(input) {
-    var x = ''
-    const inputType = input.split(':')[0]
-    if (inputType == 'start') {
-      inputList.value.push(input)
-      return
-    }
-    if (inputType == 'reef') {
-      if (reefActionInput.value == 'algae') x = 'reef:algae'
-      else x = `reef:${reefLevelInput.value}:${reefActionInput.value}`
-      reefLevelInput.value = ''
-      reefActionInput.value = ''
-    } /* else if (inputType == 'net') {
-      x = `net:${netTypeInput.value}:${netScoredInput.value}`
-      netTypeInput.value = ''
-      netScoredInput.value = ''
-    } */ else {
-      x = input
-    }
-    // console.log(inputList.value)
-    if (!autoEnded.value) inputList.value.push(`auto:${x}`)
-    else inputList.value.push(x)
-  }
-
-  function undo() {
-    if (inputList.value.length > 1) {
-    const deletedInput = inputList.value.pop()
-    redoCache.push(deletedInput)
-    } else if (inputList.value.length == 1) {
-      reset()
-    }
-  }
-
-  function redo() {
-    if (redoCache.length > 0) {
-      const deletedInput = redoCache.pop()
-      inputList.value.push(deletedInput)
-    }
-  }
 
   const fieldBool = ref(false)
   const fieldSide = computed(() => {
@@ -63,6 +23,8 @@
     }
   })
 
+  const teamInput = ref()
+  const matchInput = ref()
   const brickedInput = ref(false)
   const brickedReason = ref('')
   watch(brickedInput, (_, newState) => {
@@ -114,10 +76,62 @@
     // console.log('tick')
   }
 
+  function update(input) {
+    var x = ''
+    const inputType = input.split(':')[0]
+    if (inputType == 'start') {
+      inputList.value.push(input)
+      return
+    }
+    if (inputType == 'reef') {
+      if (reefActionInput.value == 'algae') x = 'reef:algae'
+      else x = `reef:${reefLevelInput.value}:${reefActionInput.value}`
+      reefLevelInput.value = ''
+      reefActionInput.value = ''
+    } /* else if (inputType == 'net') {
+      x = `net:${netTypeInput.value}:${netScoredInput.value}`
+      netTypeInput.value = ''
+      netScoredInput.value = ''
+    } */ else {
+      x = input
+    }
+    // console.log(inputList.value)
+    if (!autoEnded.value) inputList.value.push(`auto^${x}`)
+    else inputList.value.push(x)
+  }
+
+  function undo() {
+    if (inputList.value.length > 1) {
+    const deletedInput = inputList.value.pop()
+    redoCache.push(deletedInput)
+    } else if (inputList.value.length == 1) {
+      reset()
+    }
+  }
+
+  function redo() {
+    if (redoCache.length > 0) {
+      const deletedInput = redoCache.pop()
+      inputList.value.push(deletedInput)
+    }
+  }
+
+  function submit() {
+    inputList.value.push(`team:${teamInput.value}`)
+    inputList.value.push(`match:${matchInput.value}`)
+    inputList.value.push(`bricked:status:${brickedInput.value}`)
+    if (brickedInput.value) {
+      inputList.value.push(`bricked:reason:${brickedReason.value}`)
+    }
+    submitState.value = true
+  }
+
   function reset() {
 
     inputList.value = []
     redoCache = []
+
+    submitState.value = false
 
     brickedInput.value = false
     brickedReason.value = ''
@@ -174,6 +188,9 @@
   })
   const intakeGroundButtonClass = computed(() => {
     return `absolute w-1/11 h-1/8 ${(fieldSide.value == 'left' ? 'left-15/100' : 'right-15/100')} top-44/100`
+  })
+  const intakeGroundTypeClass = computed(() => {
+    return `absolute ${(fieldSide.value == 'left' ? 'left-15/100' : 'right-15/100')} top-47/100`
   })
   const netShotButtonClass = computed(() => {
     return `absolute ${(fieldSide.value == 'left') ? 'left-333/800' : 'right-333/800'} top-65/100 w-1/7 h-1/17 ${fieldSide.value == 'left' ? 'rotate-90' : '-rotate-90'}`
@@ -234,7 +251,7 @@
     <Button variant="outline" @click.stop.prevent="update('intake:station:top')" :class="intakeTopButtonClass">Intake</Button>
     <Button variant="outline" @click.stop.prevent="update('intake:station:bottom')" :class="intakeBottomButtonClass">Intake</Button>
     <Button v-if="groundIntakeButtonState=='ground'" @click.stop.prevent="groundIntakeButtonState='type'" variant="outline" :class="intakeGroundButtonClass">Ground Intake</Button>
-    <div v-if="groundIntakeButtonState=='type'" class="absolute left-15/100 top-47/100">
+    <div v-if="groundIntakeButtonState=='type'" :class="intakeGroundTypeClass">
       <Button @click.stop.prevent="() => { groundIntakeButtonState='ground'; update('intake:ground:coral') }" variant="outline" class="h-1/4">
         <Circle color="white" class="w-4 h-4" />
       </Button>
@@ -281,18 +298,14 @@
     <div class="my-4 flex gap-x-4">
       <div class="grow grid gap-2">
         <Label for="team">Team</Label>
-        <Input id="team" type="number" max="11000" placeholder="Team #" autocomplete="off" />
+        <Input v-model="teamInput" id="team" type="number" max="11000" placeholder="Team #" autocomplete="off" />
       </div>
       <div class="grow grid gap-2">
         <Label for="match">Match</Label>
-        <Input id="match" type="number" min="0" max="200" placeholder="Match #" autocomplete="off" />
+        <Input v-model="matchInput" id="match" type="number" min="0" max="200" placeholder="Match #" autocomplete="off" />
       </div>
     </div>
     <div class="my-4 flex items-center gap-x-4">
-      <div class="grow grid gap-2">
-        <Label for="hpTeam">Processor Human Player</Label>
-        <Input id="hpTeam" type="number" max="11000" placeholder="Human Player Team #" autocomplete="off" />
-      </div>
       <Button :disabled="autoEnded" @click.stop.prevent="beginAutoCountdown()" :variant="(!autoEnded && autoState) ? '' : 'outline'" class="grow">Auto {{ (!autoEnded && autoState) ? `- ${autoCountdown.toFixed(2)}` : '' }}</Button>
     </div>
     <div class="my-4 flex items-center space-x-2">
@@ -315,14 +328,14 @@
       </div>
     </div>
     <div class="flex gap-x-2">
-      <Button class="grow" @click.stop.prevent="submitState=true">Submit</Button>
+      <Button class="grow" @click.stop.prevent="submit()">Submit</Button>
       <Button @click.stop.prevent="reset()" variant="outline" class="grow">Reset</Button>
     </div>
   </div>
   <div v-show="submitState" class="absolute h-screen w-screen bg-background opacity-75"></div>
   <div v-show="submitState" class="absolute h-screen w-screen p-25">
     <!-- <div class="absolute h-full w-full bg-background opacity-100 z-10"></div> -->
-    <SubmissionWindow :input-list="inputList" :open-state="submitState" class="h-full w-full z-50" />
+    <SubmissionWindow :input-list="inputList" :open-state="submitState" @reset-form="reset()" class="h-full w-full z-50" />
   </div>
   
 </template>
