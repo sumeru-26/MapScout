@@ -218,8 +218,8 @@
             <VueQrcode :value="entryEncoded" :options="{
                 width: 450,
                 color: {
-                    dark: 	'#fafafa',
-                    light: 	'#09090b'
+                    light: 	'#fafafa',
+                    dark: 	'#09090b'
                 }
             }"></VueQrcode>
         </div>
