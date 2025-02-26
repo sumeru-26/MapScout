@@ -117,12 +117,12 @@
   }
 
   function submit() {
-    inputList.value.push(`team:${teamInput.value}`)
-    inputList.value.push(`match:${matchInput.value}`)
-    inputList.value.push(`bricked:status:${brickedInput.value}`)
-    if (brickedInput.value) {
-      inputList.value.push(`bricked:reason:${brickedReason.value}`)
-    }
+    // inputList.value.push(`team:${teamInput.value}`)
+    // inputList.value.push(`match:${matchInput.value}`)
+    // inputList.value.push(`bricked:status:${brickedInput.value}`)
+    // if (brickedInput.value) {
+    //   inputList.value.push(`bricked:reason:${brickedReason.value}`)
+    // }
     submitState.value = true
   }
 
@@ -335,7 +335,14 @@
   <div v-show="submitState" class="absolute h-screen w-screen bg-background opacity-75"></div>
   <div v-show="submitState" class="absolute h-screen w-screen p-25">
     <!-- <div class="absolute h-full w-full bg-background opacity-100 z-10"></div> -->
-    <SubmissionWindow :input-list="inputList" :open-state="submitState" @reset-form="reset()" class="h-full w-full z-50" />
+    <SubmissionWindow :input-list="inputList"
+      :open-state="submitState"
+      @close-window="submitState = false"
+      :bot="teamInput"
+      :match="matchInput"
+      :bricked-status="brickedInput"
+      :bricked-reason="brickedReason"
+      class="h-full w-full z-50" />
   </div>
   
 </template>

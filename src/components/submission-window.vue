@@ -14,7 +14,7 @@
     } from '@/components/ui/card'
     import { Button } from '@/components/ui/button';
 
-    const { inputList, openState } = defineProps(['inputList', 'openState'])
+    const { inputList, openState, bot, match, brickedStatus, brickedReason } = defineProps(['inputList', 'openState', 'bot', 'match','brickedStatus', 'brickedReason'])
 
     const state = ref('')
     const errorMessage = ref('')
@@ -42,9 +42,9 @@
         var metadata = {
             'event': '2025test',
             'type': 'match',
-            'match': 0,
+            'match': match,
             'team': '2374',
-            'bot': 0
+            'bot': bot
         }
         var data = {
             'start': '',
@@ -130,8 +130,8 @@
             },
             'endgame': '',
             'bricked': {
-                'status': false,
-                'reason': ''
+                'status': brickedStatus,
+                'reason': brickedReason
             }
         }
 
@@ -168,16 +168,6 @@
                     data['endgame'] = inputSegs[1]
                 } else if (inputType == 'processor') {
                     data[(autoInput) ? 'auto' : 'teleop']['processor'][inputSegs[1]]++
-                } else if (inputType == 'team') {
-                    metadata['bot'] = inputSegs[1]
-                } else if (inputType == 'match') {
-                    metadata['match'] = inputSegs[1]
-                } else if (inputType == 'bricked') {
-                    if (inputSegs[1] == 'status') {
-                        data['bricked']['status'] = (inputSegs[2] == 'true')
-                    } else if (inputSegs[1] == 'reason') {
-                        data['bricked']['reason'] = inputSegs[2]
-                    }
                 }
             }
 
@@ -218,8 +208,8 @@
             <VueQrcode :value="entryEncoded" :options="{
                 width: 450,
                 color: {
-                    dark: 	'#fafafa',
-                    light: 	'#09090b'
+                    light: 	'#fafafa',
+                    dark: 	'#09090b'
                 }
             }"></VueQrcode>
         </div>
@@ -228,7 +218,7 @@
     </CardContent>
     <CardFooter>
         <div class="w-full flex justify-end">
-            <Button @click.stop.prevent="$emit('resetForm')">Return</Button>
+            <Button @click.stop.prevent="$emit('closeWindow')">Return</Button>
         </div>
     </CardFooter>
   </Card>
