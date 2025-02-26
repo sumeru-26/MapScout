@@ -40,11 +40,12 @@
 
 
         var metadata = {
-            'event': '2025test',
+            'event': localStorage.getItem('event'),
             'type': 'match',
             'match': match,
-            'team': '2374',
-            'bot': bot
+            'team': localStorage.getItem('team'),
+            'bot': bot,
+            'scouter': localStorage.getItem('name'),
         }
         var data = {
             'start': '',

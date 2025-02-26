@@ -83,6 +83,9 @@
 @utility bg-muted-foreground {
   background-color: hsl(var(--muted-foreground));
 }
+@utility bg-destructive {
+  background-color: hsl(var(--destructive));
+}
 @utility bg-primary {
   background-color: hsl(var(--primary));
 }
@@ -100,6 +103,9 @@
 }
 @utility text-muted-foreground {
   color: hsl(var(--muted-foreground));
+}
+@utility text-destructive-foreground {
+  color: hsl(var(--destructive-foreground));
 }
 
 @utility img-left-half {

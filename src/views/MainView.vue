@@ -2,6 +2,8 @@
 
   import { ref, computed, watch } from 'vue'
 
+  import { useRouter } from 'vue-router'
+
   import { Switch } from '@/components/ui/switch';
   import { Label } from '@/components/ui/label';
   import { Button } from '@/components/ui/button';
@@ -10,6 +12,8 @@
   import { Check, X, Circle, Undo2, Redo2 } from 'lucide-vue-next';
   import DebugWindow from '@/components/debug-window.vue';
   import SubmissionWindow from '@/components/submission-window.vue';
+
+  const router = useRouter()
 
   const inputList = ref([])
   var redoCache = []
@@ -41,6 +45,7 @@
   const climbButtonState = ref('climb')
   const netButtonState = ref('net')
   const submitState = ref(false)
+  const logOutState = ref(false)
 
   const reefLevelInput = ref('')
   const reefActionInput = ref('')
@@ -132,6 +137,7 @@
     redoCache = []
 
     submitState.value = false
+    logOutState.value = false
 
     brickedInput.value = false
     brickedReason.value = ''
@@ -154,6 +160,11 @@
     autoStarted.value = false
     autoEnded.value = false
 
+  }
+
+  function logOut() {
+    localStorage.clear()
+    router.push('/login')
   }
 
   const imgClass = computed(() => {
@@ -318,7 +329,7 @@
     </div>
     <div class="">
       <DebugWindow :input-list="inputList" class="w-full h-32" />
-      <div class="my-2 flex gap-x-2">
+      <div class="my-4 flex gap-x-2">
         <Button @click.stop.prevent="undo()" variant="outline" class="grow">
           <Undo2 />
         </Button>
@@ -330,6 +341,11 @@
     <div class="flex gap-x-2">
       <Button class="grow" @click.stop.prevent="submit()">Submit</Button>
       <Button @click.stop.prevent="reset()" variant="outline" class="grow">Reset</Button>
+    </div>
+    <Button v-if="!logOutState" @click.stop.prevent="logOutState = true" variant="outline" class="my-4 w-full">Log Out</Button>
+    <div v-if="logOutState" class="my-4 flex gap-x-2">
+      <Button @click.stop.prevent="logOut()" variant="destructive" class="grow">Are you sure?</Button>
+      <Button @click.stop.prevent="logOutState = false" class="grow">No</Button>
     </div>
   </div>
   <div v-show="submitState" class="absolute h-screen w-screen bg-background opacity-75"></div>

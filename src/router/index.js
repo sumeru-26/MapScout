@@ -21,4 +21,26 @@ const router = createRouter({
   ],
 })
 
+// Navigation guard to check for authentication
+router.beforeEach((to, from, next) => {
+  // Allow access to login page
+  if (to.path === '/login') {
+    next()
+    return
+  }
+  
+  // Check if team and event are in localStorage
+  const team = localStorage.getItem('team')
+  const event = localStorage.getItem('event')
+  
+  // If either is missing, redirect to login
+  if (!team || !event) {
+    next('/login')
+    return
+  }
+  
+  // Otherwise proceed normally
+  next()
+})
+
 export default router
