@@ -122,11 +122,11 @@
         </Card>
 
         <!-- QR Code Scanner Modal -->
-        <div v-if="showScanner" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-            <div class="bg-white p-4 rounded-lg shadow-lg max-w-sm w-full">
+        <div v-if="showScanner" class="fixed inset-0 bg-background bg-opacity-50 flex items-center justify-center z-50">
+            <div class="bg-background p-4 rounded-lg shadow-lg max-w-sm w-full">
                 <div class="flex justify-between items-center mb-4">
                     <h3 class="text-lg font-medium">Scan QR Code</h3>
-                    <Button variant="ghost" size="icon" @click="showScanner = false">
+                    <Button variant="destructive" size="icon" @click="showScanner = false">
                         <X class="h-4 w-4" />
                     </Button>
                 </div>
@@ -136,7 +136,7 @@
                 <div v-if="hasCamera" class="aspect-square overflow-hidden rounded-lg mb-4">
                     <qrcode-stream @detect="onDecode" @error="onScannerError" :track="paintBoundingBox" />
                 </div>
-                <p v-if="hasCamera" class="text-sm text-gray-500 text-center">Position the QR code within the frame</p>
+                <p v-if="hasCamera" class="text-sm text-muted-foreground text-center">Position the QR code within the frame</p>
                 <Button v-if="errorMessage" class="w-full mt-2" @click="startScanner">
                     Retry Camera Access
                 </Button>
