@@ -26,6 +26,7 @@ router.beforeEach((to, from, next) => {
   // Allow access to login page
   if (to.path === '/login') {
     next()
+    document.title = 'MapScout Login'
     return
   }
   
@@ -41,6 +42,7 @@ router.beforeEach((to, from, next) => {
   
   // Otherwise proceed normally
   next()
+  document.title = 'MapScout'
 })
 
 export default router
