@@ -1,6 +1,6 @@
 <script setup>
 
-  import { ref, computed, watch } from 'vue'
+  import { ref, computed, watch, onMounted } from 'vue'
 
   import { useRouter } from 'vue-router'
 
@@ -12,6 +12,25 @@
   import { Check, X, Circle, Undo2, Redo2 } from 'lucide-vue-next';
   import DebugWindow from '@/components/debug-window.vue';
   import SubmissionWindow from '@/components/submission-window.vue';
+  import { getTeams, getMatches, checkServerHealth } from '@/services/apiService.js'
+
+  async function test() {
+    try {
+      console.log("Checking server health first...");
+      const health = await checkServerHealth();
+      console.log("Server health:", health);
+      
+      console.log("Getting teams...");
+      const teams = await getMatches();
+      console.log("Match data:", teams);
+    } catch (err) {
+      console.error("API call failed:", err);
+    }
+  }
+
+  onMounted(() => {
+    test();
+  })
 
   const router = useRouter()
 
