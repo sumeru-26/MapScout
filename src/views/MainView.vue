@@ -8,29 +8,22 @@
   import { Label } from '@/components/ui/label';
   import { Button } from '@/components/ui/button';
   import { Input } from '@/components/ui/input';
+  import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+  import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuLabel,
+    DropdownMenuSeparator,
+    DropdownMenuTrigger,
+    DropdownMenuRadioGroup,
+    DropdownMenuRadioItem
+} from '@/components/ui/dropdown-menu'
+
 
   import { Check, X, Circle, Undo2, Redo2 } from 'lucide-vue-next';
   import DebugWindow from '@/components/debug-window.vue';
   import SubmissionWindow from '@/components/submission-window.vue';
-  import { getTeams, getMatches, checkServerHealth } from '@/services/apiService.js'
-
-  async function test() {
-    try {
-      console.log("Checking server health first...");
-      const health = await checkServerHealth();
-      console.log("Server health:", health);
-      
-      console.log("Getting teams...");
-      const teams = await getMatches();
-      console.log("Match data:", teams);
-    } catch (err) {
-      console.error("API call failed:", err);
-    }
-  }
-
-  onMounted(() => {
-    test();
-  })
 
   const router = useRouter()
 
@@ -46,14 +39,36 @@
     }
   })
 
-  const teamInput = ref()
+  const teamInput = ref(NaN)
   const matchInput = ref()
   const brickedInput = ref(false)
   const brickedReason = ref('')
+  const teamOptions = ref([])
   watch(brickedInput, (_, newState) => {
       if (newState) {
         brickedReason.value = ''
       }
+  })
+  watch(matchInput, (match, _) => {
+    if (!isNaN(match) && match > 0) {
+      console.log('Match input changed to:', match)
+      const matchesArr = JSON.parse(localStorage.getItem('matches'))
+      const matchArr = matchesArr.find((entry) => entry.comp_level == "qm" && entry.match_number == match)
+      console.log(matchArr)
+      const blueAll = matchArr.alliances.blue.team_keys
+      blueAll.forEach((key, i) => {
+        blueAll[i] = parseInt(key.substring(3))
+      })
+      const redAll = matchArr.alliances.red.team_keys
+      redAll.forEach((key, i) => {
+        redAll[i] = parseInt(key.substring(3))
+      })
+      teamOptions.value = blueAll.concat(redAll)
+      console.log(teamOptions.value)
+    } else {
+      teamOptions.value = []
+      teamInput.value = NaN
+    }
   })
 
   const matchStarted = ref(false)
@@ -147,6 +162,10 @@
     // if (brickedInput.value) {
     //   inputList.value.push(`bricked:reason:${brickedReason.value}`)
     // }
+    if (isNaN(teamInput.value) || teamInput.value <= 0) {
+      alert('Please select a team.')
+      return
+    }
     submitState.value = true
   }
 
@@ -327,12 +346,28 @@
   <div :class="sideMenuDivClass">
     <div class="my-4 flex gap-x-4">
       <div class="grow grid gap-2">
-        <Label for="team">Team</Label>
-        <Input v-model="teamInput" id="team" type="number" max="11000" placeholder="Team #" autocomplete="off" />
-      </div>
-      <div class="grow grid gap-2">
         <Label for="match">Match</Label>
         <Input v-model="matchInput" id="match" type="number" min="0" max="200" placeholder="Match #" autocomplete="off" />
+      </div>
+      <div class="grow grid gap-2">
+        
+        <Label for="team">Team</Label>
+        <DropdownMenu>
+          <DropdownMenuTrigger>
+            <Button class="w-full">{{ (!isNaN(teamInput)) ? teamInput : "None Selected" }}</Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent>
+            <RadioGroup v-model="teamInput" id="team" class="grid gap-2">
+              <div v-for="team in teamOptions" :key="team">
+                <Label :for="'team' + team" class="flex items-center">
+                  <RadioGroupItem :id="'team' + team" :value="team" @click.stop.prevent="console.log(asdf)" />
+                  <span class="ml-2">{{ team }}</span>
+                </Label>
+              </div>
+            </RadioGroup>
+          </DropdownMenuContent>
+        </DropdownMenu>
+        <!--  -->
       </div>
     </div>
     <div class="my-4 flex items-center gap-x-4">

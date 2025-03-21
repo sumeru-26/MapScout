@@ -1,6 +1,7 @@
 <script setup>
     import { ref, onMounted } from 'vue'
     import { useRouter } from 'vue-router'
+    import { getTeams, getMatches, checkServerHealth } from '@/services/apiService.js'
     import { Button } from '@/components/ui/button'
     import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
     import { Input } from '@/components/ui/input'
@@ -17,7 +18,7 @@
     const hasCamera = ref(false)
     const errorMessage = ref('')
 
-    function submit() {
+    async function submit() {
         // console.log(code.value)
         try {
             const decoded = atob(code.value)
@@ -31,7 +32,18 @@
             
             localStorage.setItem('team', team)
             localStorage.setItem('event', event)
-            localStorage.setItem('name', name.value)
+            localStorage.setItem('name', name.value)        
+            try {
+                console.log("Checking server health first...")
+                const health = await checkServerHealth()
+                console.log("Server health:", health)
+                console.log("Getting teams...")
+                const matches = await getMatches()
+                console.log("Match data:", matches)
+                localStorage.setItem('matches', JSON.stringify(matches))
+            } catch (err) {
+                console.error("API call failed:", err);
+            }
             // console.log(localStorage.getItem('team'))
             // console.log(localStorage.getItem('event'))
             // console.log(localStorage.getItem('name'))
