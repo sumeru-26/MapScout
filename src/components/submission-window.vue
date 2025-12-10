@@ -48,86 +48,27 @@
             'scouter': localStorage.getItem('name'),
         }
         var data = {
-            'start': '',
             'auto': {
-                'intake': {
-                    'station': {
-                        'top': 0,
-                        'bottom': 0,
-                    },
-                    'ground': {
-                        'coral': 0,
-                        'algae': 0
-                    }
-                },
-                'reef': {
-                    'l1': {
-                        'hit': 0,
-                        'miss': 0,
-                    },
-                    'l2': {
-                        'hit': 0,
-                        'miss': 0,
-                    },
-                    'l3': {
-                        'hit': 0,
-                        'miss': 0,
-                    },
-                    'l4': {
-                        'hit': 0,
-                        'miss': 0,
-                    },
-                    'algae': 0,
-                },
-                'processor': {
+                'carrot': {
                     'hit': 0,
                     'miss': 0
                 },
-                'net': {
+                'cabbage': 0,
+                'robot': {
                     'hit': 0,
                     'miss': 0
-                },
-                'crossed': 0,
+                }
             },
             'teleop': {
-                'intake': {
-                    'station': {
-                        'top': 0,
-                        'bottom': 0,
-                    },
-                    'ground': {
-                        'coral': 0,
-                        'algae': 0
-                    }
-                },
-                'reef': {
-                    'l1': {
-                        'hit': 0,
-                        'miss': 0,
-                    },
-                    'l2': {
-                        'hit': 0,
-                        'miss': 0,
-                    },
-                    'l3': {
-                        'hit': 0,
-                        'miss': 0,
-                    },
-                    'l4': {
-                        'hit': 0,
-                        'miss': 0,
-                    },
-                    'algae': 0,
-                },
-                'processor': {
+                'carrot': {
                     'hit': 0,
                     'miss': 0
                 },
-                'net': {
+                'cabbage': 0,
+                'robot': {
                     'hit': 0,
                     'miss': 0
-                },
-                'crossed': 0,
+                }
             },
             'endgame': '',
             'bricked': {
@@ -147,28 +88,20 @@
                 const inputSegs = input.split(':')
                 console.log(inputSegs)
                 const inputType = inputSegs[0]
-                if (inputType == 'start') {
-                    data['start'] = inputSegs[1]
-                } else if (inputType == 'reef') {
-                    if (inputSegs[1] == 'algae') {
-                        data[(autoInput) ? 'auto' : 'teleop']['reef']['algae']++
-                    } else {
-                        data[(autoInput) ? 'auto' : 'teleop']['reef'][`l${inputSegs[1]}`][inputSegs[2]]++
+                const period = (autoInput) ? 'auto' : 'teleop'
+
+                if (inputType == 'carrot') {
+                    const result = inputSegs[1]
+                    if (result && data[period]['carrot'][result] !== undefined) {
+                        data[period]['carrot'][result]++
                     }
-                } else if (inputType == 'intake') {
-                    if (inputSegs[1] == 'station') {
-                        data[(autoInput) ? 'auto' : 'teleop']['intake']['station'][inputSegs[2]]++
-                    } else if (inputSegs[1] == 'ground') {
-                        data[(autoInput) ? 'auto' : 'teleop']['intake']['ground'][inputSegs[2]]++
+                } else if (inputType == 'cabbage') {
+                    data[period]['cabbage']++
+                } else if (inputType == 'robot') {
+                    const result = inputSegs[1]
+                    if (result && data[period]['robot'][result] !== undefined) {
+                        data[period]['robot'][result]++
                     }
-                } else if (inputType == 'net') {
-                    data[(autoInput) ? 'auto' : 'teleop']['net'][inputSegs[1]]++
-                } else if (inputType == 'crossed') {
-                    data[(autoInput) ? 'auto' : 'teleop']['crossed']++
-                } else if (inputType == 'climb') {
-                    data['endgame'] = inputSegs[1]
-                } else if (inputType == 'processor') {
-                    data[(autoInput) ? 'auto' : 'teleop']['processor'][inputSegs[1]]++
                 }
             }
 
