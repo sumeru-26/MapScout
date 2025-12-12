@@ -39,7 +39,7 @@
     }
   })
 
-  const teamInput = ref(NaN)
+  const teamInput = ref()
   const matchInput = ref()
   const brickedInput = ref(false)
   const brickedReason = ref('')
@@ -209,13 +209,13 @@
     return `absolute ${(fieldSide.value == 'left' ? 'left-35/200' : 'right-35/200')} top-26/50 w-1/14 h-1/8 flex flex-col items-center justify-center gap-1`
   })
   const cabbageScoredButtonClass = computed(() => {
-    return `absolute w-1/15 h-1/8 ${(fieldSide.value == 'left' ? 'left-59/200' : 'right-59/200')} top-44/100 flex flex-col items-center justify-center gap-1`
+    return `absolute w-1/15 h-1/8 ${(fieldSide.value == 'left' ? 'left-52/200' : 'right-59/200')} top-44/100 flex flex-col items-center justify-center gap-1`
   })
   const robotHitButtonClass = computed(() => {
-    return `absolute ${(fieldSide.value == 'left') ? 'left-33/100' : 'right-33/100'} top-77/100 w-1/14 h-1/8 flex flex-col items-center justify-center gap-1`
+    return `absolute ${(fieldSide.value == 'left') ? 'left-29/100' : 'right-33/100'} top-77/100 w-1/14 h-1/8 flex flex-col items-center justify-center gap-1`
   })
   const robotMissButtonClass = computed(() => {
-    return `absolute ${(fieldSide.value == 'left') ? 'left-333/800' : 'right-51/200'} top-77/100 w-1/14 h-1/8 flex flex-col items-center justify-center gap-1`
+    return `absolute ${(fieldSide.value == 'left') ? 'left-43/200' : 'right-51/200'} top-77/100 w-1/14 h-1/8 flex flex-col items-center justify-center gap-1`
   })
   const sideMenuDivClass = computed(() => {
     return `absolute ${(fieldSide.value == 'left') ? 'left-1/2' : 'left-0'} w-1/2 p-5`
@@ -230,10 +230,10 @@
   <Button variant="outline" @click.stop.prevent="fieldBool = !fieldBool" :class="swapButtonClass">Swap Sides</Button>
   <div>
     <Button variant="outline" :class="carrotHitButtonClass" @click.stop.prevent="recordScoutingEvent('carrot:hit')">
-      <Carrot class="w-5 h-5" />
+      <Carrot color="orange" class="w-5 h-5" />
     </Button>
     <Button variant="outline" :class="carrotMissButtonClass" @click.stop.prevent="recordScoutingEvent('carrot:miss')">
-      <X class="w-5 h-5" />
+      <X color="red" class="w-5 h-5" />
     </Button>
     <Button variant="outline" :class="cabbageScoredButtonClass" @click.stop.prevent="recordScoutingEvent('cabbage:scored')">
       <Circle color="#2bbd98" fill="#2bbd98" class="w-5 h-5" />
@@ -242,7 +242,7 @@
       <Bot class="w-5 h-5" />
     </Button>
     <Button variant="outline" :class="robotMissButtonClass" @click.stop.prevent="recordScoutingEvent('robot:miss')">
-      <X class="w-5 h-5" />
+      <X color="red" class="w-5 h-5" />
     </Button>
   </div>
 
@@ -255,7 +255,8 @@
       <div class="grow grid gap-2">
         
         <Label for="team">Team</Label>
-        <DropdownMenu>
+        <Input id="team" v-model="teamInput" placeholder="js put the team # twin ✌️" autocomplete="off" />
+        <!-- <DropdownMenu>
           <DropdownMenuTrigger>
             <Button class="w-full">{{ (!isNaN(teamInput)) ? teamInput : "None Selected" }}</Button>
           </DropdownMenuTrigger>
@@ -269,7 +270,7 @@
               </div>
             </RadioGroup>
           </DropdownMenuContent>
-        </DropdownMenu>
+        </DropdownMenu> -->
         <!--  -->
       </div>
     </div>
