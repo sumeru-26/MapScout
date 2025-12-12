@@ -203,19 +203,19 @@
     return `absolute ${(fieldSide.value == 'left' ? 'left-12/400' : 'right-12/400')} top-27/100 w-1/14 h-37/80`
   })
   const carrotHitButtonClass = computed(() => {
-    return `absolute ${(fieldSide.value == 'left' ? 'left-57/200' : 'right-57/200')} top-20/50 w-1/14 h-1/8 flex flex-col items-center justify-center gap-1`
+    return `absolute ${(fieldSide.value == 'left' ? 'left-35/200' : 'right-35/200')} top-36/100 w-1/14 h-1/8 flex flex-col items-center justify-center gap-1`
   })
   const carrotMissButtonClass = computed(() => {
-    return `absolute ${(fieldSide.value == 'left' ? 'left-57/200' : 'right-57/200')} top-30/50 w-1/14 h-1/8 flex flex-col items-center justify-center gap-1`
+    return `absolute ${(fieldSide.value == 'left' ? 'left-35/200' : 'right-35/200')} top-26/50 w-1/14 h-1/8 flex flex-col items-center justify-center gap-1`
   })
   const cabbageScoredButtonClass = computed(() => {
-    return `absolute w-1/11 h-1/8 ${(fieldSide.value == 'left' ? 'left-15/100' : 'right-15/100')} top-44/100 flex flex-col items-center justify-center gap-1`
+    return `absolute w-1/15 h-1/8 ${(fieldSide.value == 'left' ? 'left-59/200' : 'right-59/200')} top-44/100 flex flex-col items-center justify-center gap-1`
   })
   const robotHitButtonClass = computed(() => {
-    return `absolute ${(fieldSide.value == 'left') ? 'left-333/800' : 'right-333/800'} top-55/100 w-1/7 h-1/17 flex flex-col items-center justify-center gap-1 ${fieldSide.value == 'left' ? 'rotate-90' : '-rotate-90'}`
+    return `absolute ${(fieldSide.value == 'left') ? 'left-33/100' : 'right-33/100'} top-77/100 w-1/14 h-1/8 flex flex-col items-center justify-center gap-1`
   })
   const robotMissButtonClass = computed(() => {
-    return `absolute ${(fieldSide.value == 'left') ? 'left-333/800' : 'right-333/800'} top-70/100 w-1/7 h-1/17 flex flex-col items-center justify-center gap-1 ${fieldSide.value == 'left' ? 'rotate-90' : '-rotate-90'}`
+    return `absolute ${(fieldSide.value == 'left') ? 'left-333/800' : 'right-51/200'} top-77/100 w-1/14 h-1/8 flex flex-col items-center justify-center gap-1`
   })
   const sideMenuDivClass = computed(() => {
     return `absolute ${(fieldSide.value == 'left') ? 'left-1/2' : 'left-0'} w-1/2 p-5`
@@ -231,28 +231,18 @@
   <div>
     <Button variant="outline" :class="carrotHitButtonClass" @click.stop.prevent="recordScoutingEvent('carrot:hit')">
       <Carrot class="w-5 h-5" />
-      <span class="text-xs font-semibold">Carrot Hit</span>
-      <span class="text-sm font-bold">{{ carrotHitCount }}</span>
     </Button>
     <Button variant="outline" :class="carrotMissButtonClass" @click.stop.prevent="recordScoutingEvent('carrot:miss')">
       <X class="w-5 h-5" />
-      <span class="text-xs font-semibold">Carrot Miss</span>
-      <span class="text-sm font-bold">{{ carrotMissCount }}</span>
     </Button>
     <Button variant="outline" :class="cabbageScoredButtonClass" @click.stop.prevent="recordScoutingEvent('cabbage:scored')">
       <Circle color="#2bbd98" fill="#2bbd98" class="w-5 h-5" />
-      <span class="text-xs font-semibold">Cabbage</span>
-      <span class="text-sm font-bold">{{ cabbageScoredCount }}</span>
     </Button>
     <Button variant="outline" :class="robotHitButtonClass" @click.stop.prevent="recordScoutingEvent('robot:hit')">
       <Bot class="w-5 h-5" />
-      <span class="text-xs font-semibold">Robot Hit</span>
-      <span class="text-sm font-bold">{{ robotHitCount }}</span>
     </Button>
     <Button variant="outline" :class="robotMissButtonClass" @click.stop.prevent="recordScoutingEvent('robot:miss')">
       <X class="w-5 h-5" />
-      <span class="text-xs font-semibold">Robot Miss</span>
-      <span class="text-sm font-bold">{{ robotMissCount }}</span>
     </Button>
   </div>
 
